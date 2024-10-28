@@ -14,16 +14,14 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import use_case.change_password.ChangePasswordUserDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
-import use_case.logout.LogoutUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 
 /**
  * The DAO for user data.
  */
 public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
-        LoginUserDataAccessInterface,
-        ChangePasswordUserDataAccessInterface,
-        LogoutUserDataAccessInterface {
+                                               LoginUserDataAccessInterface,
+                                               ChangePasswordUserDataAccessInterface {
     private static final int SUCCESS_CODE = 200;
     private static final String CONTENT_TYPE_LABEL = "Content-Type";
     private static final String CONTENT_TYPE_JSON = "application/json";
@@ -68,8 +66,13 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
     }
 
     @Override
-    public void setCurrentUsername(String name) {
-        // this isn't implemented for the lab
+    public void setCurrentUser(String name) {
+
+    }
+
+    @Override
+    public String getCurrentUser() {
+        return "";
     }
 
     @Override
@@ -85,6 +88,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
 
             final JSONObject responseBody = new JSONObject(response.body().string());
 
+            //                throw new RuntimeException(responseBody.getString("message"));
             return responseBody.getInt(STATUS_CODE_LABEL) == SUCCESS_CODE;
         }
         catch (IOException | JSONException ex) {
@@ -128,7 +132,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
     @Override
     public void changePassword(User user) {
         final OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
+                                        .build();
 
         // POST METHOD
         final MediaType mediaType = MediaType.parse(CONTENT_TYPE_JSON);
@@ -137,10 +141,10 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
         requestBody.put(PASSWORD, user.getPassword());
         final RequestBody body = RequestBody.create(requestBody.toString(), mediaType);
         final Request request = new Request.Builder()
-                .url("http://vm003.teach.cs.toronto.edu:20112/user")
-                .method("PUT", body)
-                .addHeader(CONTENT_TYPE_LABEL, CONTENT_TYPE_JSON)
-                .build();
+                                    .url("http://vm003.teach.cs.toronto.edu:20112/user")
+                                    .method("PUT", body)
+                                    .addHeader(CONTENT_TYPE_LABEL, CONTENT_TYPE_JSON)
+                                    .build();
         try {
             final Response response = client.newCall(request).execute();
 
@@ -156,10 +160,5 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
         catch (IOException | JSONException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    @Override
-    public String getCurrentUsername() {
-        return null;
     }
 }
